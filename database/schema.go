@@ -54,10 +54,12 @@ func InsertNewTask(db *sql.DB, task model.Task) error {
 func UpdateTaskByID(db *sql.DB, id int, newTask model.Task) error {
 
 	task := model.Task{}
+	var _id int
 
 	row, err := db.Query("SELECT * FROM tasks WHERE id = $1", id)
 	if err != nil {
 		log.Println("Error while selecting a task by id", err)
+		return err
 	}
 	defer row.Close()
 
@@ -68,10 +70,14 @@ func UpdateTaskByID(db *sql.DB, id int, newTask model.Task) error {
 			Date    string
 			Done    bool
 		)
-		row.Scan(&id, &Name, &Details, &Date, &Done)
+		row.Scan(&_id, &Name, &Details, &Date, &Done)
 		task.Name = Name
 		task.Details = Details
 		task.Done = Done
+	}
+	//check if id exist in db
+	if _id == 0 {
+		return errors.New("Id not found in db")
 	}
 
 	if newTask.Name == "" {

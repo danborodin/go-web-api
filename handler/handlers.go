@@ -55,7 +55,8 @@ func UpdateTask(c *fiber.Ctx) error {
 
 	err = database.UpdateTaskByID(database.DB, id, *task)
 	if err != nil {
-		return c.Status(500).SendString("Error updating task, server error")
+		log.Println("Error while trying to update an task with unexistent id")
+		return c.Status(500).SendString("Id not found")
 	}
 	c.SendString("Task updated")
 
