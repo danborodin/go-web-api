@@ -21,6 +21,6 @@ Task {
 int ID;
 string Name;
 string Details;
-time Date;
+string Date;
 bool Done;
 }
