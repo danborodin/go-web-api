@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"log"
 	"todoapi/model"
 )
@@ -36,17 +37,21 @@ func GetAllTasks(db *sql.DB) []model.Task {
 }
 
 //InsertNewTask add new task in database
-func InsertNewTask(db *sql.DB, task model.Task) {
+func InsertNewTask(db *sql.DB, task model.Task) error {
 	_, err := db.Exec("INSERT INTO tasks (Name, Details, Done, Date) VALUES($1, $2, 0, $3)",
 		task.Name, task.Details, task.Date)
 
 	if err != nil {
 		log.Println(err)
+	} else {
+		log.Printf("Task added")
 	}
+
+	return err
 }
 
 //UpdateTaskByID update a task by id in db
-func UpdateTaskByID(db *sql.DB, id int, newTask model.Task) {
+func UpdateTaskByID(db *sql.DB, id int, newTask model.Task) error {
 
 	task := model.Task{}
 
@@ -80,15 +85,36 @@ func UpdateTaskByID(db *sql.DB, id int, newTask model.Task) {
 		newTask.Name, newTask.Details, newTask.Done, id)
 
 	if err != nil {
-
+		log.Println("Error while updating task")
+	} else {
+		log.Printf("Task with id %d updated", id)
 	}
+	return err
 }
 
 //DeleteTaskByID delete a task by id :)
-func DeleteTaskByID(db *sql.DB, id int) {
-	_, err := db.Exec("DELETE FROM tasks WHERE id = $1", id)
-
+func DeleteTaskByID(db *sql.DB, id int) error {
+	var _id int
+	var err error
+	row, err := db.Query("SELECT id FROM tasks WHERE id = $1", id)
 	if err != nil {
-		log.Println("Error deleting a task", err)
+		log.Println("Error while geting id", err)
 	}
+
+	defer row.Close()
+
+	for row.Next() {
+		row.Scan(&_id)
+	}
+	if _id == id {
+		log.Printf("Task with id %d deleted", id)
+		_, err = db.Exec("DELETE FROM tasks WHERE id = $1", id)
+		if err != nil {
+			log.Println("Error deleting a task by id", err)
+		}
+	} else {
+		return errors.New("Id not found in db")
+	}
+
+	return err
 }

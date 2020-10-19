@@ -16,7 +16,7 @@ func GetAllTasks(c *fiber.Ctx) error {
 	err := c.JSON(tasks)
 	if err != nil {
 		log.Println("Error while convert tasks to json", err)
-		c.Response
+		c.Status(500).SendString("Internal server error")
 	}
 	return err
 }
@@ -27,10 +27,16 @@ func AddTask(c *fiber.Ctx) error {
 
 	err := c.BodyParser(task)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Error while parsing json", err)
+		return c.Status(400).SendString("Client bad request")
 	}
 
-	database.InsertNewTask(database.DB, *task)
+	err = database.InsertNewTask(database.DB, *task)
+	if err != nil {
+		log.Println("Error while adding new task", err)
+		return c.Status(500).SendString("Internal server error")
+	}
+	c.SendString("Task added")
 
 	return err
 }
@@ -41,12 +47,17 @@ func UpdateTask(c *fiber.Ctx) error {
 
 	err := c.BodyParser(task)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return c.Status(400).SendString("Client bad request")
 	}
 
 	id, err := strconv.Atoi(c.Params("id"))
 
-	database.UpdateTaskByID(database.DB, id, *task)
+	err = database.UpdateTaskByID(database.DB, id, *task)
+	if err != nil {
+		return c.Status(500).SendString("Error updating task, server error")
+	}
+	c.SendString("Task updated")
 
 	return err
 }
@@ -55,10 +66,16 @@ func UpdateTask(c *fiber.Ctx) error {
 func DeleteTask(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
-		log.Fatal("Error converting string to integer")
+		log.Println("Error converting string to integer")
+		c.Status(400).SendString("Client bad request")
 	}
 
-	database.DeleteTaskByID(database.DB, id)
+	err = database.DeleteTaskByID(database.DB, id)
+	if err != nil {
+		c.SendStatus(400)
+		return c.SendString("id not found")
+	}
+	c.SendString("Task deleted")
 
 	return err
 }
