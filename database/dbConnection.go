@@ -20,16 +20,3 @@ func Connect() error {
 
 	return err
 }
-
-//CreateTaskTable initialize the task table for the first time
-func CreateTaskTable(db *sql.DB) {
-	db.Query(`CREATE TABLE IF NOT EXISTS tasks (
-        "id"	INTEGER NOT NULL UNIQUE,
-        "Name"	TEXT NOT NULL,
-        "Details"	TEXT,
-        "Date"	TEXT,
-        "Done"	INTEGER DEFAULT 0,
-        PRIMARY KEY("id" AUTOINCREMENT)
-)
-`)
-}
