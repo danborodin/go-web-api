@@ -1,6 +1,6 @@
 # Todo App
 
-- This repository the back-end part.
+- This repository is the back-end part.
 - You can check out the front-end following this link:  https://github.com/operator-id/ToDoApp
 
 ->Routes
@@ -18,7 +18,7 @@ https://ip:port/api/v1/item/id  ->  HTTP.PUT     (put(update) by id)
 https://ip:port/api/v1/item/id  ->  HTTP.DELETE  (delete by id)
 
 
-->Item details
+->Item structure
 
 Task {
 int ID;
