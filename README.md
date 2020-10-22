@@ -1,6 +1,7 @@
 # Todo App
 
-This repository is backend part, frontend you can find on this link https://github.com/operator-id/ToDoApp
+- This repository the back-end part.
+- You can check out the front-end following this link:  https://github.com/operator-id/ToDoApp
 
 ->Routes
 
